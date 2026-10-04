@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
 import { getProductById } from '../services/api'
 import type { Product } from '../types/product'
 
@@ -9,6 +10,7 @@ function formatPrice(value: number): string {
 
 function ProductDetails() {
   const { id } = useParams<{ id: string }>()
+  const { addItem } = useCart()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
@@ -17,6 +19,7 @@ function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [activeImage, setActiveImage] = useState(0)
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
     async function loadProduct() {
@@ -68,6 +71,25 @@ function ProductDetails() {
   }
 
   const canAddToCart = selectedVariant !== undefined && selectedVariant.stock > 0
+
+  function handleAddToCart() {
+    if (!selectedVariant || !product) return
+
+    addItem({
+      variantId: selectedVariant.id,
+      productId: product.id,
+      name: product.name,
+      imageUrl: product.imageUrls[0] ?? null,
+      size: selectedVariant.size,
+      color: selectedVariant.color,
+      unitPrice: product.discountPrice ?? product.price,
+      quantity: 1,
+      maxStock: selectedVariant.stock,
+    })
+
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
+  }
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
@@ -198,13 +220,15 @@ function ProductDetails() {
 
           <button
             disabled={!canAddToCart}
+            onClick={handleAddToCart}
             className="mt-6 w-full rounded-full bg-black px-6 py-3 text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
           >
-            Add to cart
+            {added ? 'Added to cart ✓' : 'Add to cart'}
           </button>
-          <p className="mt-2 text-xs text-neutral-400">
-            (The cart is built in a later step, so this button does nothing yet.)
-          </p>
+
+          <Link to="/cart" className="mt-3 block text-center text-sm underline">
+            View cart
+          </Link>
         </div>
       </div>
     </section>
