@@ -8,6 +8,12 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "products")
 @Getter
@@ -45,6 +51,12 @@ public class Product {
     @Setter
     private Category category;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -61,4 +73,6 @@ public class Product {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+
 }
