@@ -1,5 +1,7 @@
 package com.zentro.controller;
 
+import com.zentro.dto.AuthResponse;
+import com.zentro.dto.LoginRequest;
 import com.zentro.dto.RegisterRequest;
 import com.zentro.dto.UserResponse;
 import com.zentro.service.AuthService;
@@ -21,10 +23,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
-        UserResponse created = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
+    // POST http://localhost:8080/api/auth/login
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }
