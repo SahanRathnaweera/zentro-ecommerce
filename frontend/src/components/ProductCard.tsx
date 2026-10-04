@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { Product } from '../types/product'
 
 interface ProductCardProps {
@@ -14,7 +15,10 @@ function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.totalStock === 0
 
   return (
-    <div className="group overflow-hidden rounded-lg border border-neutral-200 bg-white transition hover:shadow-lg">
+    <Link
+      to={`/products/${product.id}`}
+      className="group block overflow-hidden rounded-lg border border-neutral-200 bg-white transition hover:shadow-lg"
+    >
       <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
         {image ? (
           <img
@@ -58,7 +62,7 @@ function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
