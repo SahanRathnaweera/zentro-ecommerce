@@ -44,7 +44,9 @@ public class Category {
     }
 
     @PreUpdate
-    protected void onUpdate() {
+    protected void onUpdate()
+
+    {
         this.updatedAt = LocalDateTime.now();
     }
 }
