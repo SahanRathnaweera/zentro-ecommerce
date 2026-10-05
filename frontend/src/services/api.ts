@@ -1,8 +1,8 @@
 import type { Category } from '../types/category'
-import type { Product } from '../types/product'
 import type { AuthResponse, RegisterData, User } from '../types/auth'
 import type { CreateOrderData, Order } from '../types/order'
 import type { Dashboard } from '../types/admin'
+import type { Product, ProductFormData } from '../types/product'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -132,6 +132,47 @@ export async function getDashboard(token: string): Promise<Dashboard> {
   }
 
   return response.json()
+}
+
+export async function adminCreateProduct(token: string, data: ProductFormData): Promise<Product> {
+  const response = await fetch(`${API_BASE_URL}/admin/products`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not create product (status ${response.status})`))
+  }
+  return response.json()
+}
+
+export async function adminUpdateProduct(
+  token: string,
+  id: number,
+  data: ProductFormData,
+): Promise<Product> {
+  const response = await fetch(`${API_BASE_URL}/admin/products/${id}`, {
+    method: 'PUT',
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not update product (status ${response.status})`))
+  }
+  return response.json()
+}
+
+export async function adminDeleteProduct(token: string, id: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/admin/products/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not delete product (status ${response.status})`))
+  }
 }
 
 export async function getProducts(categoryId?: number): Promise<Product[]> {

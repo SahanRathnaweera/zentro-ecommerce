@@ -14,6 +14,8 @@ import Orders from './pages/Orders'
 import ProductDetails from './pages/ProductDetails'
 import Products from './pages/Products'
 import Register from './pages/Register'
+import AdminProducts from './admin/AdminProducts'
+import ProductForm from './admin/ProductForm'
 
 function App() {
   return (
@@ -56,6 +58,9 @@ function App() {
                 }
               >
                 <Route index element={<Dashboard />} />
+                                <Route path="products" element={<AdminProducts />} />
+                <Route path="products/add" element={<ProductForm />} />
+                <Route path="products/edit/:id" element={<ProductForm />} />
               </Route>
             </Routes>
           </main>
