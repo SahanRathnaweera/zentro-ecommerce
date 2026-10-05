@@ -2,6 +2,7 @@ import type { Category } from '../types/category'
 import type { Product } from '../types/product'
 import type { AuthResponse, RegisterData, User } from '../types/auth'
 import type { CreateOrderData, Order } from '../types/order'
+import type { Dashboard } from '../types/admin'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -115,6 +116,24 @@ export async function registerRequest(data: RegisterData): Promise<User> {
   return response.json()
 }
 
+export async function getDashboard(token: string): Promise<Dashboard> {
+  const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+    headers: authHeaders(token),
+  })
+
+  if (response.status === 401) {
+    throw new Error('Your session has expired. Please log in again.')
+  }
+  if (response.status === 403) {
+    throw new Error('You do not have permission to view this page.')
+  }
+  if (!response.ok) {
+    throw new Error(`Failed to load dashboard (status ${response.status})`)
+  }
+
+  return response.json()
+}
+
 export async function getProducts(categoryId?: number): Promise<Product[]> {
   const url =
     categoryId === undefined
@@ -129,6 +148,7 @@ export async function getProducts(categoryId?: number): Promise<Product[]> {
 
   return response.json()
 
+  
 
   
 

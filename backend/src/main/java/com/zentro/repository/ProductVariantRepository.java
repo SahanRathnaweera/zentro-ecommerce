@@ -10,7 +10,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select v from ProductVariant v where v.id = :id")
     Optional<ProductVariant> findByIdForUpdate(@Param("id") Long id);
+
+
+    long countByStockLessThanEqual(Integer threshold);
 }

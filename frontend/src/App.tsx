@@ -1,4 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import AdminLayout from './admin/AdminLayout'
+import Dashboard from './admin/Dashboard'
+import AdminRoute from './components/AdminRoute'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
@@ -42,6 +45,18 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+
+              {/* Admin area: admin only */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminLayout />
+                  </AdminRoute>
+                }
+              >
+                <Route index element={<Dashboard />} />
+              </Route>
             </Routes>
           </main>
         </CartProvider>

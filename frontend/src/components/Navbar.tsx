@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext'
 
 function Navbar() {
   const { itemCount } = useCart()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, isAdmin, logout } = useAuth()
   const navigate = useNavigate()
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -45,6 +45,11 @@ function Navbar() {
               <NavLink to="/orders" className={linkClass}>
                 Orders
               </NavLink>
+              {isAdmin && (
+                <NavLink to="/admin" className={linkClass}>
+                  Admin
+                </NavLink>
+              )}
               <span className="hidden text-sm text-neutral-700 sm:inline">
                 Hi, {user?.fullName.split(' ')[0]}
               </span>
