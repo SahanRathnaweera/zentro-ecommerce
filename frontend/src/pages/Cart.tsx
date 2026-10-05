@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 
 function formatPrice(value: number): string {
@@ -7,6 +7,7 @@ function formatPrice(value: number): string {
 
 function Cart() {
   const { items, subtotal, updateQuantity, removeItem } = useCart()
+  const navigate = useNavigate()
 
   if (items.length === 0) {
     return (
@@ -91,13 +92,11 @@ function Cart() {
           Subtotal: <span className="font-bold">{formatPrice(subtotal)}</span>
         </p>
         <button
-          disabled
-          className="rounded-full bg-neutral-300 px-8 py-3 text-white"
-          title="Checkout is built in the next steps"
+          onClick={() => navigate('/checkout')}
+          className="rounded-full bg-black px-8 py-3 text-white transition hover:bg-neutral-700"
         >
           Proceed to checkout
         </button>
-        <p className="text-xs text-neutral-400">(Checkout is built in a later step.)</p>
       </div>
     </section>
   )

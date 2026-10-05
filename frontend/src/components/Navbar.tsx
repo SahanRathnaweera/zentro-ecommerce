@@ -42,6 +42,9 @@ function Navbar() {
 
           {isAuthenticated ? (
             <>
+              <NavLink to="/orders" className={linkClass}>
+                Orders
+              </NavLink>
               <span className="hidden text-sm text-neutral-700 sm:inline">
                 Hi, {user?.fullName.split(' ')[0]}
               </span>

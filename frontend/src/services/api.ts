@@ -1,6 +1,7 @@
 import type { Category } from '../types/category'
 import type { Product } from '../types/product'
 import type { AuthResponse, RegisterData, User } from '../types/auth'
+import type { CreateOrderData, Order } from '../types/order'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -38,6 +39,46 @@ async function readError(response: Response, fallback: string): Promise<string> 
     // The response had no JSON body
   }
   return fallback
+}
+
+
+function authHeaders(token: string): HeadersInit {
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  }
+}
+
+export async function createOrder(token: string, data: CreateOrderData): Promise<Order> {
+  const response = await fetch(`${API_BASE_URL}/orders`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  })
+
+  if (response.status === 401) {
+    throw new Error('Your session has expired. Please log in again.')
+  }
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not place order (status ${response.status})`))
+  }
+
+  return response.json()
+}
+
+export async function getMyOrders(token: string): Promise<Order[]> {
+  const response = await fetch(`${API_BASE_URL}/orders`, {
+    headers: authHeaders(token),
+  })
+
+  if (response.status === 401) {
+    throw new Error('Your session has expired. Please log in again.')
+  }
+  if (!response.ok) {
+    throw new Error(`Failed to load orders (status ${response.status})`)
+  }
+
+  return response.json()
 }
 
 export async function loginRequest(email: string, password: string): Promise<AuthResponse> {
