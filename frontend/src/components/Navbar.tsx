@@ -1,13 +1,21 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 
 function Navbar() {
   const { itemCount } = useCart()
+  const { user, isAuthenticated, logout } = useAuth()
+  const navigate = useNavigate()
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `text-sm tracking-wide transition hover:text-black ${
       isActive ? 'text-black font-semibold' : 'text-neutral-500'
     }`
+
+  function handleLogout() {
+    logout()
+    navigate('/')
+  }
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -31,6 +39,24 @@ function Navbar() {
               </span>
             )}
           </NavLink>
+
+          {isAuthenticated ? (
+            <>
+              <span className="hidden text-sm text-neutral-700 sm:inline">
+                Hi, {user?.fullName.split(' ')[0]}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="text-sm text-neutral-500 transition hover:text-black"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <NavLink to="/login" className={linkClass}>
+              Login
+            </NavLink>
+          )}
         </div>
       </nav>
     </header>

@@ -1,5 +1,6 @@
 import type { Category } from '../types/category'
 import type { Product } from '../types/product'
+import type { AuthResponse, RegisterData, User } from '../types/auth'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -28,6 +29,51 @@ export async function getProductById(id: number): Promise<Product> {
   return response.json()
 }
 
+async function readError(response: Response, fallback: string): Promise<string> {
+  try {
+    const data = await response.json()
+    if (data.message) return data.message
+    if (data.error) return data.error
+  } catch {
+    // The response had no JSON body
+  }
+  return fallback
+}
+
+export async function loginRequest(email: string, password: string): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+
+  if (response.status === 401) {
+    throw new Error('Invalid email or password')
+  }
+  if (!response.ok) {
+    throw new Error(await readError(response, `Login failed (status ${response.status})`))
+  }
+
+  return response.json()
+}
+
+export async function registerRequest(data: RegisterData): Promise<User> {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+
+  if (response.status === 409) {
+    throw new Error('This email is already registered')
+  }
+  if (!response.ok) {
+    throw new Error(await readError(response, `Registration failed (status ${response.status})`))
+  }
+
+  return response.json()
+}
+
 export async function getProducts(categoryId?: number): Promise<Product[]> {
   const url =
     categoryId === undefined
@@ -41,6 +87,9 @@ export async function getProducts(categoryId?: number): Promise<Product[]> {
   }
 
   return response.json()
+
+
+  
 
   
 }
