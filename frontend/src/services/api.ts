@@ -134,6 +134,38 @@ export async function getDashboard(token: string): Promise<Dashboard> {
   return response.json()
 }
 
+export async function adminSaveCategory(
+  token: string,
+  data: { name: string; description: string },
+  id?: number,
+): Promise<Category> {
+  const response = await fetch(
+    id === undefined ? `${API_BASE_URL}/admin/categories` : `${API_BASE_URL}/admin/categories/${id}`,
+    {
+      method: id === undefined ? 'POST' : 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify(data),
+    },
+  )
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (response.status === 409) throw new Error('A category with this name already exists')
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not save category (status ${response.status})`))
+  }
+  return response.json()
+}
+
+export async function adminDeleteCategory(token: string, id: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not delete category (status ${response.status})`))
+  }
+}
+
 export async function adminCreateProduct(token: string, data: ProductFormData): Promise<Product> {
   const response = await fetch(`${API_BASE_URL}/admin/products`, {
     method: 'POST',

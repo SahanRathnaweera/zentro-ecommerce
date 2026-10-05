@@ -16,6 +16,7 @@ import Products from './pages/Products'
 import Register from './pages/Register'
 import AdminProducts from './admin/AdminProducts'
 import ProductForm from './admin/ProductForm'
+import AdminCategories from './admin/AdminCategories'
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
                                 <Route path="products" element={<AdminProducts />} />
                 <Route path="products/add" element={<ProductForm />} />
                 <Route path="products/edit/:id" element={<ProductForm />} />
+                                <Route path="categories" element={<AdminCategories />} />
               </Route>
             </Routes>
           </main>
