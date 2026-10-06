@@ -78,8 +78,8 @@ public class AdminOrderService {
 
         return new AdminOrderResponse(
                 order.getId(),
-                order.getUser().getFullName(),
-                order.getUser().getEmail(),
+                order.getUser() != null ? order.getUser().getFullName() : order.getShippingName() + " (guest)",
+                order.getContactEmail(),
                 order.getStatus().name(),
                 order.getTotalAmount(),
                 order.getShippingName(),

@@ -4,7 +4,11 @@ import com.zentro.dto.OrderItemRequest;
 import com.zentro.dto.OrderItemResponse;
 import com.zentro.dto.OrderRequest;
 import com.zentro.dto.OrderResponse;
-import com.zentro.entity.*;
+import com.zentro.entity.Order;
+import com.zentro.entity.OrderItem;
+import com.zentro.entity.Product;
+import com.zentro.entity.ProductVariant;
+import com.zentro.entity.User;
 import com.zentro.repository.OrderRepository;
 import com.zentro.repository.ProductVariantRepository;
 import com.zentro.repository.UserRepository;
@@ -14,7 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 public class OrderService {
@@ -31,13 +39,16 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
+    // userEmail is null for guest orders
     @Transactional
     public OrderResponse createOrder(String userEmail, OrderRequest request) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+        User user = null;
+        if (userEmail != null) {
+            user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+        }
 
-        // Merge duplicate variants in the request (same variant twice = add the quantities).
-        // TreeMap sorts by id, so locks are always taken in the same order (avoids deadlocks).
+        // Merge duplicate variants (TreeMap = locks always taken in the same order)
         Map<Long, Integer> wanted = new TreeMap<>();
         for (OrderItemRequest item : request.getItems()) {
             wanted.merge(item.getVariantId(), item.getQuantity(), Integer::sum);
@@ -45,6 +56,7 @@ public class OrderService {
 
         Order order = new Order();
         order.setUser(user);
+        order.setContactEmail(request.getContactEmail().trim().toLowerCase());
         order.setShippingName(request.getShippingName().trim());
         order.setShippingPhone(request.getShippingPhone().trim());
         order.setShippingAddress(request.getShippingAddress().trim());
@@ -80,7 +92,6 @@ public class OrderService {
             orderItem.setQuantity(quantity);
             order.getItems().add(orderItem);
 
-            // Reduce the stock
             variant.setStock(variant.getStock() - quantity);
 
             total = total.add(unitPrice.multiply(BigDecimal.valueOf(quantity)));
@@ -107,8 +118,20 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 
+        // Guest orders have no user, so they never match
+        if (order.getUser() == null || !order.getUser().getEmail().equals(userEmail)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        }
+        return toResponse(order);
+    }
 
-        if (!order.getUser().getEmail().equals(userEmail)) {
+    // Guest tracking: the order id AND the email must both match
+    @Transactional(readOnly = true)
+    public OrderResponse trackOrder(Long orderId, String email) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
+        if (!order.getContactEmail().equalsIgnoreCase(email.trim())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
         return toResponse(order);
@@ -132,6 +155,7 @@ public class OrderService {
                 order.getId(),
                 order.getStatus().name(),
                 order.getTotalAmount(),
+                order.getContactEmail(),
                 order.getShippingName(),
                 order.getShippingPhone(),
                 order.getShippingAddress(),

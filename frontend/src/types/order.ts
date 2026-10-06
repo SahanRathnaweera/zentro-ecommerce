@@ -25,3 +25,23 @@ export interface CreateOrderData {
   shippingAddress: string
   items: { variantId: number; quantity: number }[]
 }
+
+export interface Order {
+  id: number
+  status: string
+  totalAmount: number
+  contactEmail: string
+  shippingName: string
+  shippingPhone: string
+  shippingAddress: string
+  createdAt: string
+  items: OrderItem[]
+}
+
+export interface CreateOrderData {
+  contactEmail: string
+  shippingName: string
+  shippingPhone: string
+  shippingAddress: string
+  items: { variantId: number; quantity: number }[]
+}

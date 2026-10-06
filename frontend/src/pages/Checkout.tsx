@@ -11,9 +11,10 @@ function formatPrice(value: number): string {
 
 function Checkout() {
   const { items, subtotal, clearCart } = useCart()
-  const { token, user, logout } = useAuth()
+  const { token, user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
 
+  const [contactEmail, setContactEmail] = useState(user?.email ?? '')
   const [shippingName, setShippingName] = useState(user?.fullName ?? '')
   const [shippingPhone, setShippingPhone] = useState(user?.phone ?? '')
   const [shippingAddress, setShippingAddress] = useState('')
@@ -35,18 +36,17 @@ function Checkout() {
     event.preventDefault()
     setError(null)
 
+    if (!/^\S+@\S+\.\S+$/.test(contactEmail.trim())) return setError('Please enter a valid email')
     if (!shippingName.trim()) return setError('Name is required')
     if (!/^[0-9+\-\s]{7,20}$/.test(shippingPhone.trim())) {
       return setError('Please enter a valid phone number')
     }
-    if (shippingAddress.trim().length < 10) {
-      return setError('Please enter your full address')
-    }
-    if (!token) return setError('Please log in again')
+    if (shippingAddress.trim().length < 10) return setError('Please enter your full address')
 
     setSubmitting(true)
     try {
       const order = await createOrder(token, {
+        contactEmail: contactEmail.trim(),
         shippingName: shippingName.trim(),
         shippingPhone: shippingPhone.trim(),
         shippingAddress: shippingAddress.trim(),
@@ -54,7 +54,11 @@ function Checkout() {
         items: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
       })
       clearCart()
-      navigate('/orders', { state: { placedOrderId: order.id } })
+      if (isAuthenticated) {
+        navigate('/orders', { state: { placedOrderId: order.id } })
+      } else {
+        navigate('/order-success', { state: { order } })
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
       if (message.includes('session has expired')) {
@@ -69,14 +73,37 @@ function Checkout() {
   }
 
   const inputClass =
-    'mt-1 w-full rounded border border-neutral-300 px-3 py-2 focus:border-black focus:outline-none focus:ring-1 focus:ring-black'
+    'mt-1 w-full rounded border border-neutral-300 px-3 py-2 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy'
 
   return (
     <section className="mx-auto grid max-w-5xl gap-10 px-4 py-12 md:grid-cols-2">
       <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Checkout</h1>
+        <h1 className="font-display text-3xl font-bold text-navy">Checkout</h1>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        {!isAuthenticated && (
+          <p className="mt-3 rounded bg-neutral-100 p-3 text-sm text-neutral-600">
+            Checking out as a guest.{' '}
+            <Link to="/login" className="font-semibold text-navy underline">
+              Log in
+            </Link>{' '}
+            to track all your orders in one place.
+          </p>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-neutral-700">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-neutral-700">
               Full name
@@ -123,7 +150,7 @@ function Checkout() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-black px-6 py-3 text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
+            className="w-full rounded-full bg-navy px-6 py-3 text-white transition hover:bg-[#1b2b5e] disabled:cursor-not-allowed disabled:bg-neutral-300"
           >
             {submitting ? 'Placing order...' : 'Place order'}
           </button>

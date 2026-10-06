@@ -48,6 +48,10 @@ function Navbar() {
             )}
           </NavLink>
 
+                    <NavLink to="/track" className={linkClass}>
+            Track
+          </NavLink>
+
           {isAuthenticated ? (
             <>
               <NavLink to="/orders" className={linkClass}>

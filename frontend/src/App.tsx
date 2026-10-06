@@ -19,6 +19,8 @@ import ProductForm from './admin/ProductForm'
 import AdminCategories from './admin/AdminCategories'
 import AdminOrders from './admin/AdminOrders'
 import Footer from './components/Footer'
+import OrderSuccess from './pages/OrderSuccess'
+import TrackOrder from './pages/TrackOrder'
 
 function App() {
   return (
@@ -34,14 +36,10 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route
-                path="/checkout"
-                element={
-                  <ProtectedRoute>
-                    <Checkout />
-                  </ProtectedRoute>
-                }
-              />
+              
+                          <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
+              <Route path="/track" element={<TrackOrder />} />
               <Route
                 path="/orders"
                 element={

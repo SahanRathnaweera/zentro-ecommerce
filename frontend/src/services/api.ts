@@ -50,10 +50,13 @@ function authHeaders(token: string): HeadersInit {
   }
 }
 
-export async function createOrder(token: string, data: CreateOrderData): Promise<Order> {
+export async function createOrder(token: string | null, data: CreateOrderData): Promise<Order> {
+  const headers: HeadersInit = { 'Content-Type': 'application/json' }
+  if (token) headers.Authorization = `Bearer ${token}`
+
   const response = await fetch(`${API_BASE_URL}/orders`, {
     method: 'POST',
-    headers: authHeaders(token),
+    headers,
     body: JSON.stringify(data),
   })
 
@@ -113,6 +116,19 @@ export async function registerRequest(data: RegisterData): Promise<User> {
     throw new Error(await readError(response, `Registration failed (status ${response.status})`))
   }
 
+  return response.json()
+}
+
+export async function trackOrder(id: number, email: string): Promise<Order> {
+  const params = new URLSearchParams({ id: String(id), email })
+  const response = await fetch(`${API_BASE_URL}/orders/track?${params.toString()}`)
+
+  if (response.status === 404) {
+    throw new Error('We could not find an order with those details.')
+  }
+  if (!response.ok) {
+    throw new Error(`Could not look up the order (status ${response.status})`)
+  }
   return response.json()
 }
 

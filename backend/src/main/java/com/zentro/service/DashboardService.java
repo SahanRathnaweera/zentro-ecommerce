@@ -39,7 +39,7 @@ public class DashboardService {
                 .stream()
                 .map(o -> new RecentOrderResponse(
                         o.getId(),
-                        o.getUser().getFullName(),
+                        o.getUser() != null ? o.getUser().getFullName() : o.getShippingName() + " (guest)",
                         o.getStatus().name(),
                         o.getTotalAmount(),
                         o.getCreatedAt()))
