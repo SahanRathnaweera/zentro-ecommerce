@@ -1,6 +1,7 @@
 package com.zentro.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -13,6 +14,11 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderRequest {
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
+    @Size(max = 150, message = "Email must be at most 150 characters")
+    private String contactEmail;
 
     @NotBlank(message = "Shipping name is required")
     @Size(max = 100, message = "Shipping name must be at most 100 characters")

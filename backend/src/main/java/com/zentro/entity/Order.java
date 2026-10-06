@@ -21,10 +21,14 @@ public class Order {
     @Setter
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     @Setter
     private User user;
+
+    @Column(name = "contact_email", nullable = false, length = 150)
+    @Setter
+    private String contactEmail;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
