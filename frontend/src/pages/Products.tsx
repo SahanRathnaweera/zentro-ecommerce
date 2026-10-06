@@ -3,11 +3,17 @@ import ProductCard from '../components/ProductCard'
 import { getCategories, getProducts } from '../services/api'
 import type { Category } from '../types/category'
 import type { Product } from '../types/product'
+import { useSearchParams } from 'react-router-dom'
 
 function Products() {
+  const [searchParams] = useSearchParams()
+  const initialCategory = searchParams.get('category')
+
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(
+    initialCategory ? Number(initialCategory) : undefined,
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 

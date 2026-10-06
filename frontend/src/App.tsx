@@ -18,6 +18,7 @@ import AdminProducts from './admin/AdminProducts'
 import ProductForm from './admin/ProductForm'
 import AdminCategories from './admin/AdminCategories'
 import AdminOrders from './admin/AdminOrders'
+import Footer from './components/Footer'
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
               </Route>
             </Routes>
           </main>
+         <Footer />
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>

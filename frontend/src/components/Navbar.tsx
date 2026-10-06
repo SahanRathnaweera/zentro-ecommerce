@@ -18,12 +18,20 @@ function Navbar() {
   }
 
   return (
-    <header className="border-b border-neutral-200 bg-white">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link to="/" className="text-2xl font-bold tracking-widest text-neutral-900">
-          ZENTRO
+    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4"> 
+                        <Link to="/" className="flex items-center gap-3">
+          <div className="h-12 w-12 overflow-hidden">
+            <img
+              src="/images/zentro logo.png"
+              alt=""
+              className="h-full w-full scale-[2.1] object-cover object-[50%_28%]"
+            />
+          </div>
+          <span className="font-display text-2xl font-bold tracking-[0.25em] text-navy">
+            ZENTRO
+          </span>
         </Link>
-
         <div className="flex items-center gap-6">
           <NavLink to="/" end className={linkClass}>
             Home

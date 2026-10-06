@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@theme {
+  --color-gold: #b8963e;
+  --color-gold-light: #e6d3a3;
+  --color-navy: #0f1b3d;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  color: #1a1a1a;
+}
