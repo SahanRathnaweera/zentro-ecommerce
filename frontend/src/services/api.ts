@@ -1,8 +1,8 @@
 import type { Category } from '../types/category'
 import type { AuthResponse, RegisterData, User } from '../types/auth'
 import type { CreateOrderData, Order } from '../types/order'
-import type { Dashboard } from '../types/admin'
 import type { Product, ProductFormData } from '../types/product'
+import type { AdminOrder, Dashboard } from '../types/admin'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -151,6 +151,30 @@ export async function adminSaveCategory(
   if (response.status === 409) throw new Error('A category with this name already exists')
   if (!response.ok) {
     throw new Error(await readError(response, `Could not save category (status ${response.status})`))
+  }
+  return response.json()
+}
+
+export async function adminGetOrders(token: string): Promise<AdminOrder[]> {
+  const response = await fetch(`${API_BASE_URL}/admin/orders`, { headers: authHeaders(token) })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) throw new Error(`Failed to load orders (status ${response.status})`)
+  return response.json()
+}
+
+export async function adminUpdateOrderStatus(
+  token: string,
+  id: number,
+  status: string,
+): Promise<AdminOrder> {
+  const response = await fetch(`${API_BASE_URL}/admin/orders/${id}/status`, {
+    method: 'PUT',
+    headers: authHeaders(token),
+    body: JSON.stringify({ status }),
+  })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not update status (status ${response.status})`))
   }
   return response.json()
 }

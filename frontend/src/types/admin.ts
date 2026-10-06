@@ -13,4 +13,28 @@ export interface Dashboard {
   totalSales: number
   lowStockVariants: number
   recentOrders: RecentOrder[]
+
+
+  
+}
+
+export interface AdminOrder {
+  id: number
+  customerName: string
+  customerEmail: string
+  status: string
+  totalAmount: number
+  shippingName: string
+  shippingPhone: string
+  shippingAddress: string
+  createdAt: string
+  items: {
+    variantId: number
+    productName: string
+    size: string
+    color: string
+    unitPrice: number
+    quantity: number
+    lineTotal: number
+  }[]
 }

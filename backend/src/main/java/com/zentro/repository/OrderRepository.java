@@ -14,6 +14,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findTop5ByOrderByCreatedAtDesc();
 
+    List<Order> findAllByOrderByCreatedAtDesc();
+
 
     @Query("select coalesce(sum(o.totalAmount), 0) from Order o where o.status <> :excluded")
     BigDecimal sumSalesExcluding(OrderStatus excluded);
