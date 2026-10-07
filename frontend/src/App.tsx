@@ -1,7 +1,13 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import AdminCategories from './admin/AdminCategories'
+import AdminCustomers from './admin/AdminCustomers'
 import AdminLayout from './admin/AdminLayout'
+import AdminOrders from './admin/AdminOrders'
+import AdminProducts from './admin/AdminProducts'
 import Dashboard from './admin/Dashboard'
+import ProductForm from './admin/ProductForm'
 import AdminRoute from './components/AdminRoute'
+import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
@@ -10,16 +16,11 @@ import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import OrderSuccess from './pages/OrderSuccess'
 import Orders from './pages/Orders'
 import ProductDetails from './pages/ProductDetails'
 import Products from './pages/Products'
 import Register from './pages/Register'
-import AdminProducts from './admin/AdminProducts'
-import ProductForm from './admin/ProductForm'
-import AdminCategories from './admin/AdminCategories'
-import AdminOrders from './admin/AdminOrders'
-import Footer from './components/Footer'
-import OrderSuccess from './pages/OrderSuccess'
 import TrackOrder from './pages/TrackOrder'
 
 function App() {
@@ -36,8 +37,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              
-                          <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-success" element={<OrderSuccess />} />
               <Route path="/track" element={<TrackOrder />} />
               <Route
@@ -59,15 +59,16 @@ function App() {
                 }
               >
                 <Route index element={<Dashboard />} />
-                                <Route path="products" element={<AdminProducts />} />
+                <Route path="products" element={<AdminProducts />} />
                 <Route path="products/add" element={<ProductForm />} />
                 <Route path="products/edit/:id" element={<ProductForm />} />
-                                <Route path="categories" element={<AdminCategories />} />
-                                                <Route path="orders" element={<AdminOrders />} />
+                <Route path="categories" element={<AdminCategories />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="customers" element={<AdminCustomers />} />
               </Route>
             </Routes>
           </main>
-         <Footer />
+          <Footer />
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>

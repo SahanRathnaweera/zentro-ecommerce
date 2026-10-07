@@ -16,6 +16,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findAllByOrderByCreatedAtDesc();
 
+    long countByUserId(Long userId);
+
+    @Query("select coalesce(sum(o.totalAmount), 0) from Order o "
+            + "where o.user.id = :userId and o.status <> :excluded")
+    BigDecimal sumSpentByUser(Long userId, OrderStatus excluded);
+
 
     @Query("select coalesce(sum(o.totalAmount), 0) from Order o where o.status <> :excluded")
     BigDecimal sumSalesExcluding(OrderStatus excluded);

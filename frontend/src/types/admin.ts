@@ -38,3 +38,15 @@ export interface AdminOrder {
     lineTotal: number
   }[]
 }
+
+
+
+export interface Customer {
+  id: number
+  fullName: string
+  email: string
+  phone: string | null
+  registeredAt: string
+  orderCount: number
+  totalSpent: number
+}

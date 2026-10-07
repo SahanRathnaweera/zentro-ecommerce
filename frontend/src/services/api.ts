@@ -2,7 +2,7 @@ import type { Category } from '../types/category'
 import type { AuthResponse, RegisterData, User } from '../types/auth'
 import type { CreateOrderData, Order } from '../types/order'
 import type { Product, ProductFormData } from '../types/product'
-import type { AdminOrder, Dashboard } from '../types/admin'
+import type { AdminOrder, Customer, Dashboard } from '../types/admin'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -67,6 +67,13 @@ export async function createOrder(token: string | null, data: CreateOrderData): 
     throw new Error(await readError(response, `Could not place order (status ${response.status})`))
   }
 
+  return response.json()
+}
+
+export async function adminGetCustomers(token: string): Promise<Customer[]> {
+  const response = await fetch(`${API_BASE_URL}/admin/customers`, { headers: authHeaders(token) })
+  if (response.status === 401) throw new Error('Your session has expired. Please log in again.')
+  if (!response.ok) throw new Error(`Failed to load customers (status ${response.status})`)
   return response.json()
 }
 
