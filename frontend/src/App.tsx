@@ -22,6 +22,7 @@ import ProductDetails from './pages/ProductDetails'
 import Products from './pages/Products'
 import Register from './pages/Register'
 import TrackOrder from './pages/TrackOrder'
+import AdminInventory from './admin/AdminInventory'
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
                 <Route path="categories" element={<AdminCategories />} />
                 <Route path="orders" element={<AdminOrders />} />
                 <Route path="customers" element={<AdminCustomers />} />
+                <Route path="inventory" element={<AdminInventory />} />
               </Route>
             </Routes>
           </main>

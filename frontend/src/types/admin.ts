@@ -50,3 +50,13 @@ export interface Customer {
   orderCount: number
   totalSpent: number
 }
+
+export interface InventoryItem {
+  variantId: number
+  productId: number
+  productName: string
+  categoryName: string
+  size: string
+  color: string
+  stock: number
+}
