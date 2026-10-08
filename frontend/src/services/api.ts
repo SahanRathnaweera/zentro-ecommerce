@@ -11,6 +11,11 @@ const API_BASE_URL = 'http://localhost:8080/api'
 async function readError(response: Response, fallback: string): Promise<string> {
   try {
     const data = await response.json()
+    // Validation errors: show the first field message (e.g. "Email must be valid")
+    if (data.fieldErrors) {
+      const first = Object.values(data.fieldErrors)[0]
+      if (typeof first === 'string') return first
+    }
     if (data.message) return data.message
     if (data.error) return data.error
   } catch {
