@@ -78,6 +78,11 @@ export async function loginRequest(email: string, password: string): Promise<Aut
   if (response.status === 401) {
     throw new Error('Invalid email or password')
   }
+
+    if (response.status === 429) {
+    throw new Error('Too many failed attempts. Please try again in 15 minutes.')
+  }
+  
   if (!response.ok) {
     throw new Error(await readError(response, `Login failed (status ${response.status})`))
   }

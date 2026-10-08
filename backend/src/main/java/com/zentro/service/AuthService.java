@@ -8,6 +8,7 @@ import com.zentro.entity.Role;
 import com.zentro.entity.User;
 import com.zentro.repository.UserRepository;
 import com.zentro.security.JwtService;
+import com.zentro.security.LoginAttemptService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final LoginAttemptService loginAttemptService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     public UserResponse register(RegisterRequest request) {
@@ -48,15 +52,21 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         String email = request.getEmail().trim().toLowerCase();
 
-        // Same message for "no such user" and "wrong password" so attackers can't tell which emails exist
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+        // Too many wrong attempts for this email: block for a while (brute-force protection)
+        if (loginAttemptService.isBlocked(email)) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "Too many failed attempts. Please try again in 15 minutes.");
+        }
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        // Same message for "no such user" and "wrong password" so attackers can't tell which emails exist
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            loginAttemptService.recordFailure(email);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
+        loginAttemptService.reset(email);
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(token, toResponse(user));
     }
