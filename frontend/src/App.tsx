@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AdminCategories from './admin/AdminCategories'
 import AdminCustomers from './admin/AdminCustomers'
+import AdminInventory from './admin/AdminInventory'
 import AdminLayout from './admin/AdminLayout'
 import AdminOrders from './admin/AdminOrders'
 import AdminProducts from './admin/AdminProducts'
@@ -18,11 +19,11 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import OrderSuccess from './pages/OrderSuccess'
 import Orders from './pages/Orders'
+import PaymentResult from './pages/PaymentResult'
 import ProductDetails from './pages/ProductDetails'
 import Products from './pages/Products'
 import Register from './pages/Register'
 import TrackOrder from './pages/TrackOrder'
-import AdminInventory from './admin/AdminInventory'
 
 function App() {
   return (
@@ -40,6 +41,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-success" element={<OrderSuccess />} />
+              <Route path="/payment-success" element={<PaymentResult success />} />
+              <Route path="/payment-cancelled" element={<PaymentResult success={false} />} />
               <Route path="/track" element={<TrackOrder />} />
               <Route
                 path="/orders"

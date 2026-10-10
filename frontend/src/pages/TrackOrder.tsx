@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import { trackOrder } from '../services/api'
 import type { Order } from '../types/order'
 
@@ -8,29 +9,44 @@ function formatPrice(value: number): string {
 }
 
 function TrackOrder() {
-  const [orderId, setOrderId] = useState('')
-  const [email, setEmail] = useState('')
+  const location = useLocation()
+  const prefill = location.state as { orderId?: string | null; email?: string | null } | null
+
+  const [orderId, setOrderId] = useState(prefill?.orderId ?? '')
+  const [email, setEmail] = useState(prefill?.email ?? '')
   const [order, setOrder] = useState<Order | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault()
+  async function search(rawId: string, rawEmail: string) {
     setError(null)
     setOrder(null)
 
-    const id = Number(orderId.replace('#', ''))
+    const id = Number(rawId.replace(/\D/g, ''))
     if (!Number.isInteger(id) || id <= 0) return setError('Enter a valid order number')
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setError('Enter a valid email')
+    if (!/^\S+@\S+\.\S+$/.test(rawEmail.trim())) return setError('Enter a valid email')
 
     setLoading(true)
     try {
-      setOrder(await trackOrder(id, email.trim()))
+      setOrder(await trackOrder(id, rawEmail.trim()))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setLoading(false)
     }
+  }
+
+  // Coming from the payment result page: look the order up straight away
+  useEffect(() => {
+    if (prefill?.orderId && prefill?.email) {
+      void search(prefill.orderId, prefill.email)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    void search(orderId, email)
   }
 
   const inputClass =
@@ -103,6 +119,10 @@ function TrackOrder() {
           <p className="mt-4 flex justify-between font-bold">
             <span>Total</span>
             <span>{formatPrice(order.totalAmount)}</span>
+          </p>
+          <p className="mt-1 text-xs text-neutral-500">
+            Payment: {order.paymentMethod === 'CARD' ? 'Card' : 'Cash on delivery'} (
+            {order.paymentStatus})
           </p>
           <p className="mt-2 text-xs text-neutral-500">
             Ship to: {order.shippingName}, {order.shippingAddress}

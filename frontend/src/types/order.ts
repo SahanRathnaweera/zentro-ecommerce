@@ -12,30 +12,14 @@ export interface Order {
   id: number
   status: string
   totalAmount: number
-  shippingName: string
-  shippingPhone: string
-  shippingAddress: string
-  createdAt: string
-  items: OrderItem[]
-}
-
-export interface CreateOrderData {
-  shippingName: string
-  shippingPhone: string
-  shippingAddress: string
-  items: { variantId: number; quantity: number }[]
-}
-
-export interface Order {
-  id: number
-  status: string
-  totalAmount: number
   contactEmail: string
   shippingName: string
   shippingPhone: string
   shippingAddress: string
   createdAt: string
   items: OrderItem[]
+  paymentMethod: 'COD' | 'CARD'
+  paymentStatus: 'UNPAID' | 'PAID' | 'FAILED'
 }
 
 export interface CreateOrderData {
@@ -43,5 +27,6 @@ export interface CreateOrderData {
   shippingName: string
   shippingPhone: string
   shippingAddress: string
+  paymentMethod: 'COD' | 'CARD'
   items: { variantId: number; quantity: number }[]
 }

@@ -3,7 +3,8 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
-import { createOrder } from '../services/api'
+import { createOrder, getPayHereForm } from '../services/api'
+import { redirectToPayHere } from '../services/payhere'
 
 function formatPrice(value: number): string {
   return `Rs. ${value.toLocaleString('en-LK', { minimumFractionDigits: 2 })}`
@@ -18,10 +19,11 @@ function Checkout() {
   const [shippingName, setShippingName] = useState(user?.fullName ?? '')
   const [shippingPhone, setShippingPhone] = useState(user?.phone ?? '')
   const [shippingAddress, setShippingAddress] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'CARD'>('COD')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (items.length === 0) {
+  if (items.length === 0 && !submitting) {
     return (
       <section className="px-4 py-24 text-center">
         <h1 className="text-2xl font-bold text-neutral-900">Your cart is empty</h1>
@@ -50,9 +52,26 @@ function Checkout() {
         shippingName: shippingName.trim(),
         shippingPhone: shippingPhone.trim(),
         shippingAddress: shippingAddress.trim(),
+        paymentMethod,
         // Only ids and quantities are sent. The server works out the prices.
         items: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
       })
+
+      if (paymentMethod === 'CARD') {
+        const origin = window.location.origin
+        const email = encodeURIComponent(order.contactEmail)
+        const form = await getPayHereForm(
+          order.id,
+          order.contactEmail,
+          `${origin}/payment-success?orderId=${order.id}&email=${email}`,
+          `${origin}/payment-cancelled?orderId=${order.id}&email=${email}`,
+        )
+        // The browser leaves the site now, so the cart is cleared only at this point
+        clearCart()
+        redirectToPayHere(form)
+        return
+      }
+
       clearCart()
       if (isAuthenticated) {
         navigate('/orders', { state: { placedOrderId: order.id } })
@@ -67,7 +86,6 @@ function Checkout() {
         return
       }
       setError(message)
-    } finally {
       setSubmitting(false)
     }
   }
@@ -141,9 +159,27 @@ function Checkout() {
             />
           </div>
 
-          <p className="rounded bg-neutral-100 p-3 text-sm text-neutral-600">
-            Payment: Cash on delivery (online payment will be added later).
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-neutral-700">Payment method</p>
+            <label className="flex items-center gap-2 rounded border border-neutral-200 p-3 text-sm">
+              <input
+                type="radio"
+                name="payment"
+                checked={paymentMethod === 'COD'}
+                onChange={() => setPaymentMethod('COD')}
+              />
+              Cash on delivery
+            </label>
+            <label className="flex items-center gap-2 rounded border border-neutral-200 p-3 text-sm">
+              <input
+                type="radio"
+                name="payment"
+                checked={paymentMethod === 'CARD'}
+                onChange={() => setPaymentMethod('CARD')}
+              />
+              Pay online by card (PayHere)
+            </label>
+          </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -152,7 +188,11 @@ function Checkout() {
             disabled={submitting}
             className="w-full rounded-full bg-navy px-6 py-3 text-white transition hover:bg-[#1b2b5e] disabled:cursor-not-allowed disabled:bg-neutral-300"
           >
-            {submitting ? 'Placing order...' : 'Place order'}
+            {submitting
+              ? 'Please wait...'
+              : paymentMethod === 'CARD'
+                ? 'Continue to payment'
+                : 'Place order'}
           </button>
         </form>
       </div>

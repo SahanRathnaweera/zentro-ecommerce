@@ -35,6 +35,16 @@ public class Order {
     @Setter
     private OrderStatus status = OrderStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false, length = 20)
+    @Setter
+    private PaymentMethod paymentMethod = PaymentMethod.COD;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false, length = 20)
+    @Setter
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     @Setter
     private BigDecimal totalAmount;

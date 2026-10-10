@@ -299,4 +299,24 @@ export async function adminUpdateStock(
     throw new Error(await readError(response, `Could not update stock (status ${response.status})`))
   }
   return response.json()
+
+  
+}
+export interface PayHereForm {
+  url: string
+  fields: Record<string, string>
+}
+
+export async function getPayHereForm(
+  orderId: number,
+  email: string,
+  returnUrl: string,
+  cancelUrl: string,
+): Promise<PayHereForm> {
+  const params = new URLSearchParams({ orderId: String(orderId), email, returnUrl, cancelUrl })
+  const response = await fetch(`${API_BASE_URL}/payments/payhere-form?${params.toString()}`)
+  if (!response.ok) {
+    throw new Error(await readError(response, `Could not start payment (status ${response.status})`))
+  }
+  return response.json()
 }

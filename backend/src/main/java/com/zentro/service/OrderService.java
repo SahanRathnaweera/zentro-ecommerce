@@ -6,6 +6,7 @@ import com.zentro.dto.OrderRequest;
 import com.zentro.dto.OrderResponse;
 import com.zentro.entity.Order;
 import com.zentro.entity.OrderItem;
+import com.zentro.entity.PaymentMethod;
 import com.zentro.entity.Product;
 import com.zentro.entity.ProductVariant;
 import com.zentro.entity.User;
@@ -57,6 +58,8 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setContactEmail(request.getContactEmail().trim().toLowerCase());
+        order.setPaymentMethod(request.getPaymentMethod() == null
+                ? PaymentMethod.COD : request.getPaymentMethod());
         order.setShippingName(request.getShippingName().trim());
         order.setShippingPhone(request.getShippingPhone().trim());
         order.setShippingAddress(request.getShippingAddress().trim());
@@ -160,6 +163,8 @@ public class OrderService {
                 order.getShippingPhone(),
                 order.getShippingAddress(),
                 order.getCreatedAt(),
-                items);
+                items,
+                order.getPaymentMethod().name(),
+                order.getPaymentStatus().name());
     }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import com.zentro.entity.PaymentMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,8 @@ public class OrderRequest {
     @Email(message = "Email must be valid")
     @Size(max = 150, message = "Email must be at most 150 characters")
     private String contactEmail;
+
+    private PaymentMethod paymentMethod = PaymentMethod.COD;
 
     @NotBlank(message = "Shipping name is required")
     @Size(max = 100, message = "Shipping name must be at most 100 characters")
