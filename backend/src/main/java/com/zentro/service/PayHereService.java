@@ -51,6 +51,7 @@ public class PayHereService {
         f.put("address", address);
         f.put("city", "Sri Lanka");
         f.put("country", "Sri Lanka");
+
         f.put("hash", md5(merchantId + orderId + amount + "LKR" + md5(merchantSecret)));
         return f;
     }
