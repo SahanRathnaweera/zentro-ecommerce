@@ -27,11 +27,11 @@ Zentro is a complete online clothing store with a **customer storefront** and a 
 
 | Home | Product details |
 |---|---|
-| ![Home](docs/screenshots/home.png) | ![Product](docs/screenshots/product-details.png) |
+| ![Home](docs/home.png) | ![Product](docs/product-details.png) |
 
 | Checkout | Admin dashboard |
 |---|---|
-| ![Checkout](docs/screenshots/checkout.png) | ![Admin](docs/screenshots/admin-dashboard.png) |
+| ![Checkout](docs/checkout.png) | ![Admin](docs/admin-dashboard.png) |
 
 ## Features
 
